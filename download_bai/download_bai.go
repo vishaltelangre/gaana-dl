@@ -2,43 +2,47 @@ package download_bai
 
 import (
 	"fmt"
+	"github.com/dchest/uniuri"
 	"github.com/vishaltelangre/gaana-dl/scraper"
 	"github.com/vishaltelangre/gaana-dl/voodoo"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 type Purse struct {
-	DestPath    string
-	PlaylistURL string
+	DestPath           string
+	PlaylistURL        string
+	AdobeHDSScriptPath string
 }
 
-func (p *Purse) DownloadTrack(trackID3Meta *scraper.TrackID3Meta) error {
+func (p *Purse) DownloadTrack(trackID3Meta *scraper.TrackID3Meta) (string, error) {
 	if trackID3Meta == nil {
-		return nil
+		return "", nil
 	}
 
 	trackStreamMeta, err := voodoo.FetchTrackStreamMeta(trackID3Meta.Id)
 	if err != nil {
-		log.Println(err)
-		return err
+		return "", err
 	}
+
+	downloadedTrackPath := fmt.Sprintf("%s/%s.mp3", p.DestPath, trackID3Meta.BaseName)
 
 	fmt.Printf("==> Downloading: %s\n", trackID3Meta.Title)
 
 	if trackStreamMeta.TrackFormat == "mp4_aac" {
 		err := downloadHDSStream(
-			p.DestPath,
+			p,
 			trackStreamMeta.StreamPath,
 			trackID3Meta.BaseName,
 		)
 		if err != nil {
-			log.Println(err)
-			return err
+			return "", err
 		}
+
+		return downloadedTrackPath, nil
 	}
 
 	// NOTE: RTMP stream is allowed to fail and exit here, not supporting
@@ -50,23 +54,22 @@ func (p *Purse) DownloadTrack(trackID3Meta *scraper.TrackID3Meta) error {
 		trackID3Meta.BaseName,
 	)
 	if err != nil {
-		log.Println(err)
-		return err
+		return "", err
 	}
 
-	return nil
+	return downloadedTrackPath, nil
 }
 
-func downloadHDSStream(destPath string, trackStreamPath string, trackBaseName string) error {
-	hsdUtility := "../vendor/AdobeHDS.php"
+func downloadHDSStream(dbp *Purse, trackStreamPath string, trackBaseName string) error {
 	manifestOpt := fmt.Sprintf(
-		"--manifest \"%s&g=EBCSRDTPHGVB&hdcore=3.4.0&plugin=aasp-3.4.0.132.66\"",
+		"--manifest \"%s&g=%s&hdcore=3.4.0&plugin=aasp-3.4.0.132.66\"",
 		trackStreamPath,
+		uniuri.NewLenChars(12, []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")),
 	)
 	miscOpts := "--quality high --delete"
 	hdsCmd := fmt.Sprintf(
 		"php %s %s %s --outfile /tmp/%s.flv",
-		hsdUtility,
+		dbp.AdobeHDSScriptPath,
 		manifestOpt,
 		miscOpts,
 		trackBaseName,
@@ -75,8 +78,10 @@ func downloadHDSStream(destPath string, trackStreamPath string, trackBaseName st
 	hdsOutfile := "/tmp/" + trackBaseName + ".flv"
 	defer os.Remove(hdsOutfile)
 
-	_, err := exec.Command("sh", "-c", hdsCmd).Output()
+	output, err := exec.Command("sh", "-c", hdsCmd).Output()
 	if err != nil {
+		outputArr := strings.Split(string(output), "\n")
+		fmt.Printf("%s\n", outputArr[len(outputArr)-2])
 		return err
 	}
 
@@ -85,7 +90,7 @@ func downloadHDSStream(destPath string, trackStreamPath string, trackBaseName st
 	flvToMp3Cmd := fmt.Sprintf(
 		"ffmpeg -i \"%s\" -acodec libmp3lame -b:a 192K -vn %s/%s.mp3",
 		hdsOutfile,
-		destPath,
+		dbp.DestPath,
 		trackBaseName,
 	)
 
