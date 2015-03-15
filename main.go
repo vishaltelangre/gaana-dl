@@ -20,7 +20,7 @@ import (
 	"path/filepath"
 )
 
-const VERSION = "0.0.2"
+const VERSION = "0.0.3"
 
 var (
 	showVersion        *bool   = flag.Bool("v", false, "Show version info")

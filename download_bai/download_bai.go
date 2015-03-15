@@ -81,7 +81,7 @@ func downloadHDSStream(dbp *Purse, trackStreamPath string, trackBaseName string)
 	output, err := exec.Command("sh", "-c", hdsCmd).Output()
 	if err != nil {
 		outputArr := strings.Split(string(output), "\n")
-		fmt.Printf("%s\n", outputArr[len(outputArr)-2])
+		fmt.Printf("%s\n", outputArr)
 		return err
 	}
 

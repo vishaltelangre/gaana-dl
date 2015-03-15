@@ -69,6 +69,9 @@ gaana-dl -u http://gaana.com/playlist/gaana-dj-us-top-50 -d ./dj-us-top-50
 
 ## Changelog
 
+### __v0.0.3__
+- [FIX] Generalize CSS selector to parse a provided listing url, for e.g. this one -- http://gaana.com/artist/hans-zimmer/songs :P
+
 ### __v0.0.2__
 - Automatic support for setting ID3 tags (meta details) of tracks while downloading.
 - [FIX] Abode HDS streams aren't downloading.

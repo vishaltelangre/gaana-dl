@@ -17,9 +17,8 @@ type TrackID3Meta struct {
 }
 
 const (
-	TRACK_NODE_CSS_PATH = `.content-container .track > .parentnode,
-                         .content-container .album-horizantal-listing
-                         		> .parentnode`
+	TRACK_NODE_CSS_PATH = `.track > .parentnode,
+                         .album-horizantal-listing > .parentnode`
 )
 
 func parseDOM(playlistURL string) *goquery.Selection {
