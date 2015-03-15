@@ -42,11 +42,12 @@ func unmarshalTrackMeta(rawTrackMeta string) (*TrackID3Meta, error) {
 	// Cleanup dirty Artist stuff!
 	delimitedArtists := strings.Split(trackID3Meta.Artist, ",")
 	artistsArr := make([]string, len(delimitedArtists))
-	for _, artist := range delimitedArtists {
+	for i, artist := range delimitedArtists {
 		artist := strings.Split(artist, "###")[0]
-		artistsArr = append(artistsArr, artist)
+		artistsArr[i] = artist
 	}
-	trackID3Meta.Artist = strings.Join(artistsArr, "")
+
+	trackID3Meta.Artist = strings.Join(artistsArr, ", ")
 
 	// Cleanup dirty Title, also
 	trackID3Meta.Title = strings.Replace(trackID3Meta.Title, "&nbsp;", "", -1)
@@ -67,7 +68,7 @@ func Scrape(playlistURL string) []*TrackID3Meta {
 	trackNodes.Each(func(i int, s *goquery.Selection) {
 		trackID3Meta, err := unmarshalTrackMeta(s.Text())
 		if err == nil {
-			tracks = append(tracks, trackID3Meta)
+			tracks[i] = trackID3Meta
 		}
 	})
 
