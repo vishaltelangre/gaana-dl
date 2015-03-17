@@ -15,7 +15,7 @@ With automatic ID3 tags injection support:
 
 ## Download standalone `gaana-dl` binaries:
 
-Head onto Releases page [here](https://github.com/vishaltelangre/gaana-dl/releases).
+Download standalone executable binaries for your architecture from [here](https://github.com/vishaltelangre/gaana-dl/releases/tag/v0.0.4).
 
 ## Hacker's way of installation
 
@@ -56,19 +56,7 @@ gaana-dl -u http://gaana.com/album/ek-villain -d ./ek-villain
 
 ## Changelog
 
-### __v0.0.4__
-- No need to provide in AdobeHDS script path now onwards (thanks [@sharang-d](http://github.com/sharang-d) for a good suggestion)
-
-### __v0.0.3__
-- [FIX] Generalize CSS selector to parse a provided listing url, for e.g. this one -- http://gaana.com/artist/hans-zimmer/songs :P
-
-### __v0.0.2__
-- Automatic support for setting ID3 tags (meta details) of tracks while downloading.
-- [FIX] Abode HDS streams aren't downloading.
-
-### __v0.0.1__
-- Support to download most of the songs from gaana.com!
-
+See what changes have been made with every release, [here](https://github.com/vishaltelangre/gaana-dl/releases).
 
 ## Thankings
 
