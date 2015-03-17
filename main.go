@@ -17,17 +17,15 @@ import (
 	"github.com/vishaltelangre/gaana-dl/scraper"
 	"log"
 	"os"
-	"path/filepath"
 )
 
-const VERSION = "0.0.3"
+const VERSION = "0.0.4"
 
 var (
-	showVersion        *bool   = flag.Bool("v", false, "Show version info")
-	showHelp           *bool   = flag.Bool("h", false, "Show help and usage of command")
-	customDownloadDir  *string = flag.String("d", ".", "Destination directory path")
-	playlistURL        *string = flag.String("u", "", "Playlist URL")
-	adobeHDSScriptPath *string = flag.String("a", "", "Absolute path to AdobeHDS.php script")
+	showVersion       *bool   = flag.Bool("v", false, "Show version info")
+	showHelp          *bool   = flag.Bool("h", false, "Show help and usage of command")
+	customDownloadDir *string = flag.String("d", ".", "Destination directory path")
+	playlistURL       *string = flag.String("u", "", "Playlist URL")
 )
 
 func printUsage() {
@@ -39,7 +37,6 @@ Usage:
 
 The OPTIONS are:
 	-u 		Playlist URL (Required).
-	-a 		Absolute path to AdobeHDS.php script (Required if HDS_SCRIPT_PATH environment vairable is not defined).
 	-d 		Destination directory path where all the tracks will be downloaded.
 			By Default, it will download in the current directory only.
 	-h 		Show this usage help.
@@ -91,20 +88,7 @@ func main() {
 		}
 	}
 
-	hdsScriptPath := *adobeHDSScriptPath
-	if _, err := os.Stat(hdsScriptPath); os.IsNotExist(err) {
-		hdsScriptPath = os.Getenv("HDS_SCRIPT_PATH")
-
-		if _, err = os.Stat(hdsScriptPath); os.IsNotExist(err) {
-			log.Fatalf(
-				"AdobeHDS.php script at \"%s\" seems doesn't exists!\n",
-				hdsScriptPath)
-		}
-	}
-
 	var dbp download_bai.Purse
-	hdsScriptPath, _ = filepath.Abs(hdsScriptPath)
-	dbp.AdobeHDSScriptPath = hdsScriptPath
 	dbp.DestPath = *customDownloadDir
 	dbp.PlaylistURL = *playlistURL
 

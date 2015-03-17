@@ -12,9 +12,12 @@ With automatic ID3 tags injection support:
 
 ## Prerequsites
 - `php`, `ffmpeg` commands
-- Download this [AdobeHDS.php](https://github.com/vishaltelangre/gaana-dl/blob/master/vendor-scripts/AdobeHDS.php) script somewhere, which is needed to download Adobe HDS streams.
 
-## Installation
+## Download standalone `gaana-dl` binaries:
+
+Head onto Releases page [here](https://github.com/vishaltelangre/gaana-dl/releases).
+
+## Hacker's way of installation
 
 - Before getting started, make sure that you have [installed Go](http://golang.org/doc/install) and have set workspace (`$GOPATH`, etc.), or [RTFM](http://golang.org/doc/code.html) yourself how to do it!
 
@@ -28,14 +31,6 @@ go get -u github.com/vishaltelangre/gaana-dl
 gaana-dl -v
 ```
 
-- Define `HDS_SCRIPT_PATH` with the path to above downloaded `AdobeHDS.php` script in your `~/.bashrc`, or `~/.zshrc` file. Or you can export it while using `gaana-dl` command, for example:
-
-```
-export HDS_SCRIPT_PATH=/path/to/AdobeHDS.php
-```
-
-- **NOTE:** Also, look for stand-alone `gaana-dl` executable binary in this repository built using `go build` on Mac OSX.
-
 - **NOTE:** Downloading some songs don't work yet, such as RTMP streams for example.
 
 ## Usage
@@ -46,7 +41,6 @@ Usage:
 
 The OPTIONS are:
   -u    Playlist URL (Required).
-  -a    Absolute path to AdobeHDS.php script (Required if HDS_SCRIPT_PATH environment vairable is not defined).
   -d    Destination directory path where all the tracks will be downloaded.
       By Default, it will download in the current directory only.
   -h    Show this usage help.
@@ -56,18 +50,14 @@ The OPTIONS are:
 ### Examples:
 
 ```
-# Here, providing path to AdbobeHDS.php with "-a" option
-gaana-dl -u http://gaana.com/album/ek-paheli-leela -d /Users/vishal/Music/leela -a /path/to/AdobeHDS.php
-
-# Or by exporting path while executing command
-export HDS_SCRIPT_PATH=path/to/AdobeHDS.php
-gaana-dl -u gaana-dl -u http://gaana.com/album/ek-villain -d ./ek-villain
-
-# Or by assuming, HDS_SCRIPT_PATH is already set in your ~/.bashrc:
-gaana-dl -u http://gaana.com/playlist/gaana-dj-us-top-50 -d ./dj-us-top-50
+gaana-dl -u http://gaana.com/album/ek-paheli-leela -d /Users/vishal/Music/leela
+gaana-dl -u http://gaana.com/album/ek-villain -d ./ek-villain
  ```
 
 ## Changelog
+
+### __v0.0.4__
+- No need to provide in AdobeHDS script path now onwards (thanks [@sharang-d](http://github.com/sharang-d) for a good suggestion)
 
 ### __v0.0.3__
 - [FIX] Generalize CSS selector to parse a provided listing url, for e.g. this one -- http://gaana.com/artist/hans-zimmer/songs :P

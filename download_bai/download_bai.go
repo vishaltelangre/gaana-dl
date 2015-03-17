@@ -9,14 +9,18 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
 type Purse struct {
-	DestPath           string
-	PlaylistURL        string
-	AdobeHDSScriptPath string
+	DestPath    string
+	PlaylistURL string
 }
+
+const (
+	REMOTE_HDS_SCRIPT_PATH = "https://raw.githubusercontent.com/vishaltelangre/gaana-dl/master/vendor-scripts/AdobeHDS.php"
+)
 
 func (p *Purse) DownloadTrack(trackID3Meta *scraper.TrackID3Meta) (string, error) {
 	if trackID3Meta == nil {
@@ -61,6 +65,11 @@ func (p *Purse) DownloadTrack(trackID3Meta *scraper.TrackID3Meta) (string, error
 }
 
 func downloadHDSStream(dbp *Purse, trackStreamPath string, trackBaseName string) error {
+	hdsScriptPath, err := dbp.GetHDSScriptPath()
+	if err != nil {
+		return err
+	}
+
 	manifestOpt := fmt.Sprintf(
 		"--manifest \"%s&g=%s&hdcore=3.4.0&plugin=aasp-3.4.0.132.66\"",
 		trackStreamPath,
@@ -69,7 +78,7 @@ func downloadHDSStream(dbp *Purse, trackStreamPath string, trackBaseName string)
 	miscOpts := "--quality high --delete"
 	hdsCmd := fmt.Sprintf(
 		"php %s %s %s --outfile /tmp/%s.flv",
-		dbp.AdobeHDSScriptPath,
+		hdsScriptPath,
 		manifestOpt,
 		miscOpts,
 		trackBaseName,
@@ -123,4 +132,39 @@ func downloadOtherStream(destPath string, trackStreamPath string, trackBaseName 
 	io.Copy(trackFile, res.Body)
 
 	return nil
+}
+
+func (p *Purse) GetHDSScriptPath() (string, error) {
+	basePath, _ := filepath.Abs(os.Getenv("HOME") + "/.gaana-dl")
+	hdsScriptPath := basePath + "/AdobeHDS.php"
+
+	err := os.MkdirAll(basePath, 0755)
+	if err != nil {
+		return "", err
+	}
+
+	if _, err := os.Stat(hdsScriptPath); err == nil {
+		return hdsScriptPath, nil
+	}
+
+	hdsScriptFile, _ := os.Create(hdsScriptPath)
+	defer hdsScriptFile.Close()
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", REMOTE_HDS_SCRIPT_PATH, nil)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Accept", "*/*")
+
+	res, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	defer res.Body.Close()
+	io.Copy(hdsScriptFile, res.Body)
+
+	return hdsScriptPath, nil
 }
