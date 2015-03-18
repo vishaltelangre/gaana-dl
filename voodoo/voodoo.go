@@ -3,6 +3,7 @@ package voodoo
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dchest/uniuri"
 	"io/ioutil"
 	"net/http"
 )
@@ -23,10 +24,23 @@ func GetTrackStreamMetaPath(trackId string) string {
 
 func FetchTrackStreamMeta(trackId string) (*TrackStreamMeta, error) {
 	trackStreamMetaPath := GetTrackStreamMetaPath(trackId)
-	req, err := http.NewRequest("GET", trackStreamMetaPath, nil)
+	req, err := http.NewRequest("POST", trackStreamMetaPath, nil)
+
 	if err != nil {
 		return nil, err
 	}
+
+	cookieVal := fmt.Sprintf(
+		"PHPSESSID=%s",
+		uniuri.NewLenChars(
+			26,
+			[]byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"),
+		),
+	)
+
+	req.Header.Set("Accept", "*/*")
+	req.Header.Set("Cookie", cookieVal)
+	// req.Header.Set("Cookie", "PHPSESSID=pcgrcm87erfab8msf48e9lib53;")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

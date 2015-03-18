@@ -15,7 +15,7 @@ With automatic ID3 tags injection support:
 
 ## Download standalone `gaana-dl` binaries:
 
-Download standalone executable binaries for your architecture from [here](https://github.com/vishaltelangre/gaana-dl/releases/tag/v0.0.4).
+Download standalone executable binaries for your architecture from [here](https://github.com/vishaltelangre/gaana-dl/releases/tag/v0.0.5).
 
 ## Hacker's way of installation
 
